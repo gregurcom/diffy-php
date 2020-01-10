@@ -1,0 +1,27 @@
+<?php
+
+require_once('vendor/autoload.php');
+
+$project_id = 856;
+$screenshot_id = 32092;
+$key = 'c31fec8e123e479e75d46744c13a7d91';
+
+\Diffy\Diffy::setApiKey($key);
+
+// List all projects.
+//print_r(\Diffy\Project::all());
+
+// Create screenshots.
+//print_r(\Diffy\Screenshot::create($project_id, 'production'));
+
+// Retrieve a Screenshot.
+//$screenshot = \Diffy\Screenshot::retrieve($screenshot_id);
+//var_export($screenshot->isCompleted());
+// Full data about Screenshot.
+//print_r($screenshot->data);
+
+// Set screenshots set as baseline.
+//print_r(\Diffy\Screenshot::setBaselineSet($project_id, $screenshot_id));
+
+// Compare environments.
+//print_r(\Diffy\Project::compare($project_id, ['env1' => 'prod', 'env2' => 'stage']));
