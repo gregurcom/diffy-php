@@ -34,6 +34,9 @@ class Screenshot {
    * @throws \Diffy\InvalidArgumentsException
    */
   public static function create(int $projectId, string $environment) {
+    if (empty($projectId)) {
+      throw new InvalidArgumentsException('Project ID can not be empty');
+    }
     if (!in_array($environment, self::$TYPES)) {
       throw new InvalidArgumentsException('"' . $environment . '" is not a valid environment. Can be one of: production, staging, development, custom');
     }

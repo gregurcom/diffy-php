@@ -25,3 +25,8 @@ $key = 'c31fec8e123e479e75d46744c13a7d91';
 
 // Compare environments.
 //print_r(\Diffy\Project::compare($project_id, ['env1' => 'prod', 'env2' => 'stage']));
+
+// Create a Diff.
+//$screenshot_id1 = \Diffy\Screenshot::create($project_id, 'production');
+//$screenshot_id2 = \Diffy\Screenshot::create($project_id, 'staging');
+//print_r(\Diffy\Diff::create($project_id, $screenshot_id1, $screenshot_id2));
