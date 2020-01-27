@@ -6,8 +6,17 @@ class Screenshot {
 
   static $TYPES = ['production', 'staging', 'development', 'custom'];
 
-  const STATUS_COMPLETED = 2;
-  const STATUS_ZIPFILE = 4;
+  // Screenshots were not started.
+  const NOT_STARTED = 0;
+  // Actively in progress.
+  const PROGRESS = 1;
+  // Completed but event "completed" is not yet fired. We send notifications,
+  // webhook on this event.
+  const COMPLETED = 2;
+  // "Completed" event is fired. Starting to create a zipfile.
+  const COMPLETED_HOOK_EXECUTED = 3;
+  // Zipfile is completed.
+  const ZIPFILE = 4;
 
   /**
    * Screenshot's data.
