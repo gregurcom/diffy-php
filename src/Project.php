@@ -5,7 +5,7 @@ namespace Diffy;
 class Project
 {
 
-    public static $ENVIRONMENTS = ['prod', 'stage', 'dev', 'baseline', 'custom'];
+    public static $ENVIRONMENTS = ['prod', 'stage', 'dev', 'baseline', 'custom', 'upload'];
 
     /**
      * Get list of all Projects.
@@ -58,6 +58,12 @@ class Project
     }
 
 
+    /**
+     * Get project settings.
+     *
+     * @param int $projectId
+     * @return mixed
+     */
     public static function get(int $projectId)
     {
         return Diffy::request('GET', 'projects/'.$projectId);
