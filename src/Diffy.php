@@ -11,12 +11,8 @@ class Diffy
 
     public static $apiToken;
 
-    //public static $baseUrl = 'https://app.diffy.website/api/';
-    //public static $uiBaseUrl = 'https://app.diffy.website/#/';
-
-    public static $baseUrl = 'http://diffy.docksal/api/';
-
-    public static $uiBaseUrl = 'http://diffy.docksal/#/';
+    public static $baseUrl = 'https://app.diffy.website/api/';
+    public static $uiBaseUrl = 'https://app.diffy.website/#/';
 
     public static $client;
 
