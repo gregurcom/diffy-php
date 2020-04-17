@@ -14,6 +14,9 @@ class Diffy
     public static $baseUrl = 'https://app.diffy.website/api/';
     public static $uiBaseUrl = 'https://app.diffy.website/#/';
 
+    public static $browserStackAccessKey;
+    public static $browserStackUsername;
+
     public static $client;
 
     /**
@@ -109,6 +112,26 @@ class Diffy
         $response = self::$client->request($type, $uri, $params);
 
         return json_decode($response->getBody()->getContents(), true);
+    }
+
+    /**
+     * Sets the Browserstack credentials to be used for requests.
+     *
+     * @param string $username
+     * @param string $accessKey
+     */
+    public static function setBrowserstackCredentials($username, $accessKey)
+    {
+        self::$browserStackUsername = $accessKey;
+        self::$browserStackAccessKey = $accessKey;
+    }
+
+    /**
+     * @return array The Browserstack credentials used for requests.
+     */
+    public static function getBrowserstackCredentials()
+    {
+        return ['username' => self::$browserStackUsername, 'accessToken' => self::$browserStackAccessKey];
     }
 
 }
