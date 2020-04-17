@@ -2,96 +2,136 @@
 
 namespace Diffy;
 
-class Screenshot {
+class Screenshot
+{
 
-  static $TYPES = ['production', 'staging', 'development', 'custom'];
+    static $TYPES = ['production', 'staging', 'development', 'custom', 'upload'];
 
-  // Screenshots were not started.
-  const NOT_STARTED = 0;
-  // Actively in progress.
-  const PROGRESS = 1;
-  // Completed but event "completed" is not yet fired. We send notifications,
-  // webhook on this event.
-  const COMPLETED = 2;
-  // "Completed" event is fired. Starting to create a zipfile.
-  const COMPLETED_HOOK_EXECUTED = 3;
-  // Zipfile is completed.
-  const ZIPFILE = 4;
+    // Screenshots were not started.
+    const NOT_STARTED = 0;
+    // Actively in progress.
+    const PROGRESS = 1;
+    // Completed but event "completed" is not yet fired. We send notifications,
+    // webhook on this event.
+    const COMPLETED = 2;
+    // "Completed" event is fired. Starting to create a zipfile.
+    const COMPLETED_HOOK_EXECUTED = 3;
+    // Zipfile is completed.
+    const ZIPFILE = 4;
 
-  /**
-   * Screenshot's data.
-   *
-   * @var array
-   */
-  public $data;
+    /**
+     * Screenshot's data.
+     *
+     * @var array
+     */
+    public $data;
 
-  public $screenshotId;
+    public $screenshotId;
 
-  /**
-   * Screenshot constructor.
-   */
-  protected function __construct(int $screenshotId) {
-    $this->screenshotId = $screenshotId;
-  }
-
-  /**
-   * Create set of Screenshots.
-   *
-   * @param \Diffy\int $projectId
-   * @param \Diffy\string $environment
-   * @return mixed
-   * @throws \Diffy\InvalidArgumentsException
-   */
-  public static function create(int $projectId, string $environment) {
-    if (empty($projectId)) {
-      throw new InvalidArgumentsException('Project ID can not be empty');
-    }
-    if (!in_array($environment, self::$TYPES)) {
-      throw new InvalidArgumentsException('"' . $environment . '" is not a valid environment. Can be one of: production, staging, development, custom');
+    /**
+     * Screenshot constructor.
+     */
+    protected function __construct(int $screenshotId)
+    {
+        $this->screenshotId = $screenshotId;
     }
 
-    return Diffy::request('POST', 'projects/' . $projectId . '/screenshots', [
-      'environment' => $environment,
-    ]);
-  }
+    /**
+     * Create set of Screenshots.
+     *
+     * @param \Diffy\int $projectId
+     * @param \Diffy\string $environment
+     * @return mixed
+     * @throws \Diffy\InvalidArgumentsException
+     */
+    public static function create(int $projectId, string $environment)
+    {
+        if (empty($projectId)) {
+            throw new InvalidArgumentsException('Project ID can not be empty');
+        }
+        if (!in_array($environment, self::$TYPES)) {
+            throw new InvalidArgumentsException('"'.$environment.'" is not a valid environment. Can be one of: production, staging, development, custom');
+        }
 
-  /**
-   * Set whole set of screenshots as a Baseline.
-   *
-   * @param \Diffy\int $projectId
-   * @param \Diffy\int $screenshotId
-   * @return mixed
-   */
-  public static function setBaselineSet(int $projectId, int $screenshotId) {
-    return Diffy::request('PUT', 'projects/' . $projectId . '/set-base-line-set/' . $screenshotId);
-  }
+        return Diffy::request(
+            'POST',
+            'projects/'.$projectId.'/screenshots',
+            [
+                'environment' => $environment,
+            ]
+        );
+    }
 
-  /**
-   * Load full info on Screenshot.
-   *
-   * @param \Diffy\int $screenshotId
-   * @return mixed
-   */
-  public static function retrieve(int $screenshotId) {
-    $instance = new Screenshot($screenshotId);
-    $instance->refresh();
-    return $instance;
-  }
+    /**
+     * Set whole set of screenshots as a Baseline.
+     *
+     * @param \Diffy\int $projectId
+     * @param \Diffy\int $screenshotId
+     * @return mixed
+     */
+    public static function setBaselineSet(int $projectId, int $screenshotId)
+    {
+        return Diffy::request('PUT', 'projects/'.$projectId.'/set-base-line-set/'.$screenshotId);
+    }
 
-  /**
-   * Refresh data about current Screenshot.
-   */
-  public function refresh() {
-    $this->data = Diffy::request('GET', 'snapshots/' . $this->screenshotId);
-  }
+    /**
+     * Load full info on Screenshot.
+     *
+     * @param \Diffy\int $screenshotId
+     * @return mixed
+     */
+    public static function retrieve(int $screenshotId)
+    {
+        $instance = new Screenshot($screenshotId);
+        $instance->refresh();
 
-  /**
-   * Check if Screenshot is completed.
-   *
-   * @return boolean
-   */
-  public function isCompleted() {
-    return in_array($this->data['state'], [self::STATUS_COMPLETED, self::STATUS_ZIPFILE]);
-  }
+        return $instance;
+    }
+
+    /**
+     * Refresh data about current Screenshot.
+     */
+    public function refresh()
+    {
+        $this->data = Diffy::request('GET', 'snapshots/'.$this->screenshotId);
+    }
+
+    /**
+     * Check if Screenshot is completed.
+     *
+     * @return boolean
+     */
+    public function isCompleted()
+    {
+        return in_array($this->data['state'], [self::STATUS_COMPLETED, self::STATUS_ZIPFILE]);
+    }
+
+
+    /**
+     * Create Screenshot from browserstack.
+     *
+     * @param int $projectId
+     * @param array $screenshots
+     * @return mixed
+     * @throws InvalidArgumentsException
+     */
+    public static function createBrowserStackScreenshot(int $projectId, array $screenshots)
+    {
+        if (empty($projectId)) {
+            throw new InvalidArgumentsException('Project ID can not be empty');
+        }
+
+        if (empty($screenshots)) {
+            throw new InvalidArgumentsException('Screenshots list can not be empty');
+        }
+
+        return Diffy::request(
+            'POST',
+            'projects/'.$projectId.'/create-browser-stack-screenshot',
+            [
+                'screenshots' => $screenshots,
+            ]
+        );
+    }
 
 }
