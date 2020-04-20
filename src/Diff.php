@@ -95,7 +95,7 @@ class Diff {
    * @return boolean
    */
   public function isCompleted() {
-    return in_array($this->data['state'], [self::STATUS_COMPLETED, self::STATUS_ZIPFILE]);
+    return in_array($this->data['state'], [self::COMPLETED, self::ZIPFILE]);
   }
 
   /**
