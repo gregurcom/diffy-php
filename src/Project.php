@@ -54,6 +54,10 @@ class Project
             $arguments['env2Url'] = $params['env2Url'];
         }
 
+        if (isset($params['commitSha'])) {
+            $arguments['commitSha'] = $params['commitSha'];
+        }
+
         return Diffy::request('POST', 'projects/'.$projectId.'/compare', $arguments);
     }
 
