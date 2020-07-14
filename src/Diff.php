@@ -146,4 +146,54 @@ class Diff
         return $this->data['result'];
     }
 
+    /**
+     * Get diffs list for project.
+     *
+     * @param int $projectId
+     * @param int $page
+     * @return mixed
+     * @throws InvalidArgumentsException
+     */
+    public static function list(int $projectId, int $page = 0)
+    {
+
+        if (empty($projectId)) {
+            throw new InvalidArgumentsException('Project ID can not be empty');
+        }
+
+        return Diffy::request(
+            'GET',
+            'projects/'.$projectId.'/diffs?page='.$page
+        );
+    }
+
+    /**
+     * Get diff state name.
+     *
+     * @param $state
+     * @return string
+     */
+    public static function getStateName($state)
+    {
+        $name = '';
+        switch ($state) {
+            case self::NOTSTARTED:
+                $name = 'Not started';
+                break;
+            case self::PROGRESS:
+            case self::SNAPSHOT_IN_PROGRESS:
+            case self::SNAPSHOT_IN_PROGRESS_DIFF_IN_PROGRESS:
+                $name = 'In progress';
+                break;
+            case self::COMPLETED:
+            case self::COMPLETED_HOOK_EXECUTED:
+            case self::ZIPFILE:
+            case self::WITHOUT_ZIP:
+                $name = 'Completed';
+                break;
+        }
+
+        return $name;
+    }
+
 }
