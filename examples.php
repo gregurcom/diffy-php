@@ -4,8 +4,7 @@ require_once('vendor/autoload.php');
 
 $project_id = 999;
 $screenshot_id = 32092;
-//$key = 'c31fec8e123e479e75d46744c13a7d91';
-$key = 'cb467e043db41d1dd3196607790adbe6';
+$key = 'c31fec8e123e479e75d46744c13a7d91';
 
 \Diffy\Diffy::setApiKey($key);
 
