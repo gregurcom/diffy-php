@@ -134,4 +134,64 @@ class Screenshot
         );
     }
 
+
+    /**
+     * Create Screenshot with custom files.
+     *
+     * @param int $projectId
+     * @param array $data Format: $data[] = ['file'=> '', 'url'=> '', 'breakpoint'=> '']. File should be in PNG format.
+     * @param string $screenshotName
+     *
+     * @return mixed
+     * @throws InvalidArgumentsException
+     */
+    public static function createCustomScreenshot(int $projectId, array $data, string $screenshotName)
+    {
+
+        if (empty($projectId)) {
+            throw new InvalidArgumentsException('Project ID can not be empty');
+        }
+
+        if (empty($data)) {
+            throw new InvalidArgumentsException('Data list can not be empty');
+        }
+
+        $params = [
+            'multipart' => [
+                [
+                    'name' => 'snapshotName',
+                    'contents' => $screenshotName,
+                ],
+            ],
+        ];
+
+        foreach ($data as $key => $item) {
+            if (isset($item['file']) && isset($item['url']) && isset($item['breakpoint']) &&
+                !empty($item['file']) && !empty($item['url']) && !empty($item['breakpoint'])) {
+                $params['multipart'][] = [
+                    'name' => "files[$key]",
+                    'contents' => $item['file'],
+                ];
+                $params['multipart'][] = [
+                    'name' => "urls[$key]",
+                    'contents' => $item['url'],
+                ];
+                $params['multipart'][] = [
+                    'name' => "breakpoints[$key]",
+                    'contents' => $item['breakpoint'],
+                ];
+
+            } else {
+                throw new InvalidArgumentsException('Data list contain not valid data. Each item of list should be array with items: [\'file\'=> \'\', \'url\'=> \'\', \'breakpoint\'=> \'\']');
+            }
+        }
+
+        return Diffy::request(
+            'POST',
+            'projects/'.$projectId.'/create-custom-snapshot',
+            [],
+            $params
+        );
+    }
+
 }
