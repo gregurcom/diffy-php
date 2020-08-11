@@ -99,16 +99,33 @@ class Diffy
     public static function request($type, $uri, $data = [], $params = [])
     {
         $params['headers'] = [
-            'Authorization' => 'Bearer '.self::getApiToken(),
+            'Authorization' => 'Bearer ' . self::getApiToken(),
         ];
 
         if (!empty($data)) {
             $params['json'] = $data;
         }
 
-        $response = self::$client->request($type, $uri, $params);
+        try {
+            $response = self::$client->request($type, $uri, $params);
+            $responseBodyAsString = json_decode($response->getBody()->getContents(), true);
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            if ($e->hasResponse()) {
+                $response = $e->getResponse();
+                $statusCode = $response->getStatusCode();
 
-        return json_decode($response->getBody()->getContents(), true);
+                if ($statusCode == '400') {
+                    // Diffy knows errors. We need this code because of GuzzleHttp truncated errors.
+                    $responseErrroData = json_decode((string)$response->getBody(), true);
+                    if (isset($responseErrroData['errors'])) {
+                        throw new \Exception(implode(PHP_EOL, $responseErrroData['errors']));
+                    }
+                }
+            }
+            throw $e;
+        }
+
+        return $responseBodyAsString;
     }
 
 }
