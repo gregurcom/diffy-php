@@ -164,7 +164,6 @@ class Screenshot
                 'contents' => $url,
             ];
         }
-        print_r($data);
         foreach ($upload['files'] as $key => $filepath) {
             $data[] = [
                 'Content-type' => 'multipart/form-data',
