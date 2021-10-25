@@ -113,4 +113,25 @@ class Project
       return Diffy::request('POST', 'projects', $data);
     }
 
+    /**
+     * Create project.
+     *
+     * @return mixed
+     */
+    public static function createFromData(array $data)
+    {
+        return Diffy::request('POST', 'projects', $data);
+    }
+
+    /**
+     * Update project settings.
+     *
+     * @param int $projectId
+     * @return mixed
+     */
+    public static function update(int $projectId, array $data)
+    {
+        return Diffy::request('POST', 'projects/' . $projectId, $data);
+    }
+
 }

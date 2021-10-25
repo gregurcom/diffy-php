@@ -3,6 +3,7 @@
 namespace Diffy;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 
 class Diffy
 {
@@ -120,25 +121,71 @@ class Diffy
         try {
             $response = self::getClient()->request($type, $uri, $params);
             $responseBodyAsString = json_decode($response->getBody()->getContents(), true);
-        } catch (\GuzzleHttp\Exception\RequestException $e) {
-            if ($e->hasResponse()) {
-                $response = $e->getResponse();
-                $statusCode = $response->getStatusCode();
+        }
+        catch (ClientException $e) {
+            $response = $e->getResponse();
+            $content = json_decode($response->getBody()->getContents(), true);
+            if (isset($content['type']) && ($content['type'] == 'validation_error')) {
+                $request = $e->getRequest();
+                $uri = $request->getUri();
 
-                $responseBodyAsString = $response->getBody()->getContents();
+                // Client Error: `GET /` resulted in a `404 Not Found` response:
+                // <html> ... (truncated)
+                $message = sprintf(
+                    '%s %s Error: %s %s',
+                    $request->getMethod(),
+                    $uri,
+                    $response->getStatusCode(),
+                    implode('. ', $content['errors'])
+                );
 
-                if ($statusCode == '400') {
-                    // Diffy knows errors. We need this code because of GuzzleHttp truncated errors.
-                    $responseErrroData = json_decode((string)$response->getBody(), true);
-                    if (isset($responseErrroData['errors'])) {
-                        throw new \Exception(implode(PHP_EOL, $responseErrroData['errors']));
-                    }
-                }
+                throw new \Exception($message);
             }
+            // If it was something else.
             throw $e;
         }
 
         return $responseBodyAsString;
+    }
+
+    /**
+     * Do a HTTP request. Wrapper to pass Authentication behind the scene.
+     */
+    public static function multipartRequest($type, $uri, array $data, array $params = [])
+    {
+        $params['headers'] = [
+            'Authorization' => 'Bearer '.self::getApiToken(),
+        ];
+
+        $params['multipart'] = $data;
+
+        try {
+            $response = self::$client->request($type, $uri, $params);
+        }
+        catch (ClientException $e) {
+            $response = $e->getResponse();
+            $content = json_decode($response->getBody()->getContents(), true);
+            if (isset($content['type']) && ($content['type'] == 'validation_error')) {
+                $request = $e->getRequest();
+                $uri = $request->getUri();
+
+                // Client Error: `GET /` resulted in a `404 Not Found` response:
+                // <html> ... (truncated)
+                $message = sprintf(
+                    '%s %s Error: %s %s',
+                    $request->getMethod(),
+                    $uri,
+                    $response->getStatusCode(),
+                    implode('. ', $content['errors'])
+                );
+
+                throw new \Exception($message);
+            }
+            // If it was something else.
+            throw $e;
+        }
+
+        return json_decode($response->getBody()->getContents(), true);
     }
 
 }
