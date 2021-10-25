@@ -111,6 +111,74 @@ class Screenshot
       return $this->data['status']['estimate'];
     }
 
+    /**
+     * Create set of Screenshots from images.
+     *
+     * @param \Diffy\int $projectId
+     * @throws \Diffy\InvalidArgumentsException
+     */
+    public static function createUpload(int $projectId, array $upload)
+    {
+        if (empty($projectId)) {
+            throw new InvalidArgumentsException('Project ID can not be empty');
+        }
+        if (!isset($upload['files']) || !is_array($upload['files'])) {
+            throw new InvalidArgumentsException('"files" property is missing or is not an array');
+        }
+        if (!isset($upload['snapshotName']) || empty($upload['snapshotName'])) {
+            throw new InvalidArgumentsException('"snapshotName" property is missing');
+        }
+        if (!isset($upload['breakpoints']) || !is_array($upload['breakpoints'])) {
+            throw new InvalidArgumentsException('"breakpoints" property is missing or is not an array');
+        }
+        if (!isset($upload['urls']) || !is_array($upload['urls'])) {
+            throw new InvalidArgumentsException('"urls" property is missing or is not an array');
+        }
+
+        if (count($upload['files']) != count($upload['urls']) || count($upload['urls']) != count($upload['urls'])) {
+            throw new InvalidArgumentsException('Number of "urls", "breakpoints" and "files" should be the same');
+        }
+
+        foreach ($upload['files'] as $filepath) {
+            if (!file_exists($filepath)) {
+                throw new InvalidArgumentsException(sprintf('File %s can not be found. Check file exists and readable.', $filepath));
+            }
+        }
+
+        $data = [];
+
+        $data[] = [
+            'name' => 'snapshotName',
+            'contents' => $upload['snapshotName'],
+        ];
+        foreach ($upload['breakpoints'] as $key => $breakpoint) {
+            $data[] = [
+                'name' => 'breakpoints[' . $key . ']',
+                'contents' => $breakpoint,
+            ];
+        }
+
+        foreach ($upload['urls'] as $key => $url) {
+            $data[] = [
+                'name' => 'urls[' . $key . ']',
+                'contents' => $url,
+            ];
+        }
+        print_r($data);
+        foreach ($upload['files'] as $key => $filepath) {
+            $data[] = [
+                'Content-type' => 'multipart/form-data',
+                'name' => 'files[' . $key . ']',
+                'filename' => basename($filepath),
+                'contents' => file_get_contents($filepath),
+            ];
+        }
+        return Diffy::multipartRequest(
+            'POST',
+            'projects/' . $projectId . '/create-custom-snapshot',
+            $data
+        );
+    }
 
     /**
      * Create Screenshot from browserstack.
