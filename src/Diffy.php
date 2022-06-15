@@ -7,12 +7,12 @@ use GuzzleHttp\Exception\ClientException;
 
 class Diffy
 {
-
     public static $apiKey;
 
     public static $apiToken;
 
     public static $baseUrl = 'https://app.diffy.website/api/';
+
     public static $uiBaseUrl = 'https://app.diffy.website/#/';
 
     public static $client;
@@ -20,22 +20,21 @@ class Diffy
     /**
      * Init guzzle client.
      *
-     * @return \GuzzleHttp\Client
+     * @return Client
      */
-    public static function getClient() {
-      if (empty(self::$client)) {
-        self::$client = new Client(
-          [
-            'base_uri' => self::getApiBaseUrl(),
-            'headers' => [
-              'Accept' => 'application/json',
-              'Content-Type' => 'application/json',
-            ],
-          ]
-        );
-      }
+    public static function getClient()
+    {
+        if (empty(self::$client)) {
+            self::$client = new Client([
+                'base_uri' => self::getApiBaseUrl(),
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                ],
+            ]);
+        }
 
-      return self::$client;
+        return self::$client;
     }
 
     /**
@@ -89,17 +88,12 @@ class Diffy
      */
     public static function refreshToken()
     {
-
-
-        $response = self::getClient()->request(
-            'POST',
-            'auth/key',
-            [
-                'json' => ['key' => self::getApiKey()],
-            ]
-        );
+        $response = self::getClient()->request('POST', 'auth/key', [
+            'json' => ['key' => self::getApiKey()],
+        ]);
 
         $data = json_decode($response->getBody()->getContents());
+
         if (isset($data->token)) {
             self::setApiToken($data->token);
         }
@@ -121,10 +115,10 @@ class Diffy
         try {
             $response = self::getClient()->request($type, $uri, $params);
             $responseBodyAsString = json_decode($response->getBody()->getContents(), true);
-        }
-        catch (ClientException $e) {
+        } catch (ClientException $e) {
             $response = $e->getResponse();
             $content = json_decode($response->getBody()->getContents(), true);
+
             if (isset($content['type']) && ($content['type'] == 'validation_error')) {
                 $request = $e->getRequest();
                 $uri = $request->getUri();
@@ -161,10 +155,10 @@ class Diffy
 
         try {
             $response = self::$client->request($type, $uri, $params);
-        }
-        catch (ClientException $e) {
+        } catch (ClientException $e) {
             $response = $e->getResponse();
             $content = json_decode($response->getBody()->getContents(), true);
+
             if (isset($content['type']) && ($content['type'] == 'validation_error')) {
                 $request = $e->getRequest();
                 $uri = $request->getUri();
@@ -187,5 +181,4 @@ class Diffy
 
         return json_decode($response->getBody()->getContents(), true);
     }
-
 }

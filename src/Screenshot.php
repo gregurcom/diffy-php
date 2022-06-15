@@ -4,7 +4,6 @@ namespace Diffy;
 
 class Screenshot
 {
-
     static $TYPES = ['production', 'staging', 'development', 'custom', 'upload'];
 
     // Screenshots were not started.
@@ -28,9 +27,6 @@ class Screenshot
 
     public $screenshotId;
 
-    /**
-     * Screenshot constructor.
-     */
     protected function __construct(int $screenshotId)
     {
         $this->screenshotId = $screenshotId;
@@ -39,46 +35,47 @@ class Screenshot
     /**
      * Create set of Screenshots.
      *
-     * @param \Diffy\int $projectId
-     * @param \Diffy\string $environment
+     * @param int $projectId
+     * @param string $environment
+     *
      * @return mixed
-     * @throws \Diffy\InvalidArgumentsException
+     *
+     * @throws InvalidArgumentsException
      */
     public static function create(int $projectId, string $environment)
     {
         if (empty($projectId)) {
             throw new InvalidArgumentsException('Project ID can not be empty');
         }
+
         if (!in_array($environment, self::$TYPES)) {
-            throw new InvalidArgumentsException('"'.$environment.'" is not a valid environment. Can be one of: production, staging, development, custom');
+            throw new InvalidArgumentsException('"' . $environment . '" is not a valid environment. Can be one of: production, staging, development, custom');
         }
 
-        return Diffy::request(
-            'POST',
-            'projects/'.$projectId.'/screenshots',
-            [
-                'environment' => $environment,
-            ]
-        );
+        return Diffy::request('POST', 'projects/' . $projectId . '/screenshots', [
+            'environment' => $environment,
+        ]);
     }
 
     /**
      * Set whole set of screenshots as a Baseline.
      *
-     * @param \Diffy\int $projectId
-     * @param \Diffy\int $screenshotId
+     * @param int $projectId
+     * @param int $screenshotId
+     *
      * @return mixed
      */
     public static function setBaselineSet(int $projectId, int $screenshotId)
     {
-        return Diffy::request('PUT', 'projects/'.$projectId.'/set-base-line-set/'.$screenshotId);
+        return Diffy::request('PUT', 'projects/' . $projectId . '/set-base-line-set/' . $screenshotId);
     }
 
     /**
      * Load full info on Screenshot.
      *
-     * @param \Diffy\int $screenshotId
-     * @return \Diffy\Screenshot
+     * @param int $screenshotId
+     *
+     * @return Screenshot
      */
     public static function retrieve(int $screenshotId)
     {
@@ -93,7 +90,7 @@ class Screenshot
      */
     public function refresh()
     {
-        $this->data = Diffy::request('GET', 'snapshots/'.$this->screenshotId);
+        $this->data = Diffy::request('GET', 'snapshots/' . $this->screenshotId);
     }
 
     /**
@@ -108,29 +105,34 @@ class Screenshot
 
     public function getEstimate()
     {
-      return $this->data['status']['estimate'];
+        return $this->data['status']['estimate'];
     }
 
     /**
      * Create set of Screenshots from images.
      *
-     * @param \Diffy\int $projectId
-     * @throws \Diffy\InvalidArgumentsException
+     * @param int $projectId
+     *
+     * @throws InvalidArgumentsException
      */
     public static function createUpload(int $projectId, array $upload)
     {
         if (empty($projectId)) {
             throw new InvalidArgumentsException('Project ID can not be empty');
         }
+
         if (!isset($upload['files']) || !is_array($upload['files'])) {
             throw new InvalidArgumentsException('"files" property is missing or is not an array');
         }
+
         if (!isset($upload['snapshotName']) || empty($upload['snapshotName'])) {
             throw new InvalidArgumentsException('"snapshotName" property is missing');
         }
+
         if (!isset($upload['breakpoints']) || !is_array($upload['breakpoints'])) {
             throw new InvalidArgumentsException('"breakpoints" property is missing or is not an array');
         }
+
         if (!isset($upload['urls']) || !is_array($upload['urls'])) {
             throw new InvalidArgumentsException('"urls" property is missing or is not an array');
         }
@@ -145,25 +147,18 @@ class Screenshot
             }
         }
 
-        $data = [];
-
-        $data[] = [
-            'name' => 'snapshotName',
-            'contents' => $upload['snapshotName'],
+        $data = [
+            ['name' => 'snapshotName', 'contents' => $upload['snapshotName']],
         ];
+
         foreach ($upload['breakpoints'] as $key => $breakpoint) {
-            $data[] = [
-                'name' => 'breakpoints[' . $key . ']',
-                'contents' => $breakpoint,
-            ];
+            $data[] = ['name' => 'breakpoints[' . $key . ']', 'contents' => $breakpoint];
         }
 
         foreach ($upload['urls'] as $key => $url) {
-            $data[] = [
-                'name' => 'urls[' . $key . ']',
-                'contents' => $url,
-            ];
+            $data[] = ['name' => 'urls[' . $key . ']', 'contents' => $url];
         }
+
         foreach ($upload['files'] as $key => $filepath) {
             $data[] = [
                 'Content-type' => 'multipart/form-data',
@@ -172,11 +167,8 @@ class Screenshot
                 'contents' => file_get_contents($filepath),
             ];
         }
-        return Diffy::multipartRequest(
-            'POST',
-            'projects/' . $projectId . '/create-custom-snapshot',
-            $data
-        );
+
+        return Diffy::multipartRequest('POST', 'projects/' . $projectId . '/create-custom-snapshot', $data);
     }
 
     /**
@@ -184,7 +176,9 @@ class Screenshot
      *
      * @param int $projectId
      * @param array $screenshots
+     *
      * @return mixed
+     *
      * @throws InvalidArgumentsException
      */
     public static function createBrowserStackScreenshot(int $projectId, array $screenshots)
@@ -197,15 +191,10 @@ class Screenshot
             throw new InvalidArgumentsException('Screenshots list can not be empty');
         }
 
-        return Diffy::request(
-            'POST',
-            'projects/'.$projectId.'/create-browser-stack-screenshot',
-            [
-                'screenshots' => $screenshots,
-            ]
-        );
+        return Diffy::request('POST', 'projects/' . $projectId . '/create-browser-stack-screenshot', [
+            'screenshots' => $screenshots,
+        ]);
     }
-
 
     /**
      * Create Screenshot with custom files.
@@ -215,11 +204,11 @@ class Screenshot
      * @param string $screenshotName
      *
      * @return mixed
+     *
      * @throws InvalidArgumentsException
      */
     public static function createCustomScreenshot(int $projectId, array $data, string $screenshotName)
     {
-
         if (empty($projectId)) {
             throw new InvalidArgumentsException('Project ID can not be empty');
         }
@@ -238,32 +227,18 @@ class Screenshot
         ];
 
         foreach ($data as $key => $item) {
-            if (isset($item['file']) && isset($item['url']) && isset($item['breakpoint']) &&
-                !empty($item['file']) && !empty($item['url']) && !empty($item['breakpoint'])) {
-                $params['multipart'][] = [
-                    'name' => "files[$key]",
-                    'contents' => $item['file'],
-                ];
-                $params['multipart'][] = [
-                    'name' => "urls[$key]",
-                    'contents' => $item['url'],
-                ];
-                $params['multipart'][] = [
-                    'name' => "breakpoints[$key]",
-                    'contents' => $item['breakpoint'],
-                ];
-
+            if (
+                isset($item['file']) && isset($item['url']) && isset($item['breakpoint']) &&
+                !empty($item['file']) && !empty($item['url']) && !empty($item['breakpoint'])
+            ) {
+                $params['multipart'][] = ['name' => "files[$key]", 'contents' => $item['file']];
+                $params['multipart'][] = ['name' => "urls[$key]", 'contents' => $item['url']];
+                $params['multipart'][] = ['name' => "breakpoints[$key]", 'contents' => $item['breakpoint']];
             } else {
                 throw new InvalidArgumentsException('Data list contain not valid data. Each item of list should be array with items: [\'file\'=> \'\', \'url\'=> \'\', \'breakpoint\'=> \'\']');
             }
         }
 
-        return Diffy::request(
-            'POST',
-            'projects/'.$projectId.'/create-custom-snapshot',
-            [],
-            $params
-        );
+        return Diffy::request('POST', 'projects/' . $projectId . '/create-custom-snapshot', [], $params);
     }
-
 }
