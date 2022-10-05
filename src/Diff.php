@@ -71,6 +71,29 @@ class Diff
     }
 
     /**
+     * Update diff's name.
+     *
+     * @param int $diffId
+     * @param string $name
+     * @return mixed
+     * @throws InvalidArgumentsException
+     */
+    public static function updateName(int $diffId, string $name)
+    {
+        if (empty($diffId)) {
+            throw new InvalidArgumentsException('Diff ID can not be empty');
+        }
+
+        if (empty($name)) {
+            throw new InvalidArgumentsException('Name can not be empty');
+        }
+
+        return Diffy::request('PUT', 'diffs/' . $diffId, [
+            'name' => $name,
+        ]);
+    }
+
+    /**
      * Load full info on Diff.
      *
      * @param int $diffId
