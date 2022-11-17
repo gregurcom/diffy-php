@@ -71,6 +71,14 @@ class Screenshot
     }
 
     /**
+     * Get list of all Screenshots.
+     */
+    public static function all(int $projectId)
+    {
+        return Diffy::request('GET', 'projects/' . $projectId . '/screenshots');
+    }
+
+    /**
      * Load full info on Screenshot.
      *
      * @param int $screenshotId
