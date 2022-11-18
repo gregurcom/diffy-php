@@ -37,12 +37,13 @@ class Screenshot
      *
      * @param int $projectId
      * @param string $environment
+     * @param array $options
      *
      * @return mixed
      *
      * @throws InvalidArgumentsException
      */
-    public static function create(int $projectId, string $environment)
+    public static function create(int $projectId, string $environment, $options = [])
     {
         if (empty($projectId)) {
             throw new InvalidArgumentsException('Project ID can not be empty');
@@ -52,9 +53,13 @@ class Screenshot
             throw new InvalidArgumentsException('"' . $environment . '" is not a valid environment. Can be one of: production, staging, development, custom');
         }
 
+        if ($environment == 'custom' && !isset($options['baseUrl'])) {
+            throw new InvalidArgumentsException('If custom environment selected you need to specify "customUrl" parameter');
+        }
+
         return Diffy::request('POST', 'projects/' . $projectId . '/screenshots', [
             'environment' => $environment,
-        ]);
+        ] + $options);
     }
 
     /**
