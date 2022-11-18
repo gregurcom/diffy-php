@@ -107,6 +107,18 @@ class Screenshot
     }
 
     /**
+     * Set name of Screenshot.
+     */
+    public function setName($name)
+    {
+        if (empty($name)) {
+            throw new InvalidArgumentsException('Screenshot name can not be empty');
+        }
+
+        $this->data = Diffy::request('POST', 'snapshots/' . $this->screenshotId, ['name' => $name]);
+    }
+
+    /**
      * Check if Screenshot is completed.
      *
      * @return boolean
