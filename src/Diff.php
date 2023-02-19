@@ -47,10 +47,11 @@ class Diff
      * @param int $projectId
      * @param int $screenshotId1
      * @param int $screenshotId2
+     * @param string $name
      * @return mixed
      * @throws \Diffy\InvalidArgumentsException
      */
-    public static function create(int $projectId, int $screenshotId1, int $screenshotId2)
+    public static function create(int $projectId, int $screenshotId1, int $screenshotId2, string $name = '')
     {
         if (empty($projectId)) {
             throw new InvalidArgumentsException('Project ID can not be empty');
@@ -67,6 +68,7 @@ class Diff
         return Diffy::request('POST', 'projects/' . $projectId . '/diffs', [
             'snapshot1' => $screenshotId1,
             'snapshot2' => $screenshotId2,
+            'name' => $name,
         ]);
     }
 
