@@ -31,6 +31,22 @@ class Project
             throw new InvalidArgumentsException('Compare call requires "env2" as the second environment to compare.');
         }
 
+        if ($params['env1'] === 'production') {
+            $params['env1'] = 'prod';
+        } elseif ($params['env1'] === 'development') {
+            $params['env1'] = 'dev';
+        } elseif ($params['env1'] === 'staging') {
+            $params['env1'] = 'stage';
+        }
+
+        if ($params['env2'] === 'production') {
+            $params['env2'] = 'prod';
+        } elseif ($params['env2'] === 'development') {
+            $params['env2'] = 'dev';
+        } elseif ($params['env2'] === 'staging') {
+            $params['env2'] = 'stage';
+        }
+
         if (!in_array($params['env1'], self::$ENVIRONMENTS)) {
             throw new InvalidArgumentsException('"env1" is not a valid environment. Can be one of: prod, stage, dev, baseline, custom');
         }
