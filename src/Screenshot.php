@@ -49,6 +49,14 @@ class Screenshot
             throw new InvalidArgumentsException('Project ID can not be empty');
         }
 
+        if ($environment === 'prod') {
+            $environment = 'production';
+        } elseif ($environment === 'dev') {
+            $environment = 'development';
+        } elseif ($environment === 'stage') {
+            $environment = 'staging';
+        }
+
         if (!in_array($environment, self::$TYPES)) {
             throw new InvalidArgumentsException('"' . $environment . '" is not a valid environment. Can be one of: production, staging, development, custom');
         }
