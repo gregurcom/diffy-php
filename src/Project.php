@@ -173,4 +173,16 @@ class Project
     {
         return Diffy::request('POST', 'projects/' . $projectId, $data);
     }
+
+    /**
+     * Update project settings with yaml file.
+     *
+     * @param int $projectId
+     *
+     * @return mixed
+     */
+    public static function updateYaml(int $projectId, array $data)
+    {
+        return Diffy::request('PUT', 'projects/' . $projectId . '/cli', $data);
+    }
 }
