@@ -47,7 +47,7 @@ class Diff
      * @param int $projectId
      * @param int $screenshotId1
      * @param int $screenshotId2
-     * @param string $name
+     * @param array $options
      * @return mixed
      * @throws \Diffy\InvalidArgumentsException
      */
