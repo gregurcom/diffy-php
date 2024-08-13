@@ -92,6 +92,10 @@ class Project
             $arguments['commitSha'] = $params['commitSha'];
         }
 
+        if (!empty($params['notifications'])) {
+            $arguments['notifications'] = $params['notifications'];
+        }
+
         return Diffy::request('POST', 'projects/' . $projectId . '/compare', $arguments);
     }
 
