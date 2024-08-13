@@ -68,8 +68,8 @@ class Diff
         return Diffy::request('POST', 'projects/' . $projectId . '/diffs', [
             'snapshot1' => $screenshotId1,
             'snapshot2' => $screenshotId2,
-            'name' => $options['name'],
-            'notifications' => $options['notifications'],
+            'name' => $options['name'] ?? null,
+            'notifications' => $options['notifications'] ?? null,
         ]);
     }
 
